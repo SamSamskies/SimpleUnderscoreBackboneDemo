@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Demo</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <style>
+      body {
+        padding-top: 50px;
+      }
+
+      #movie-details {
+        border: 1px solid #000;
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+      }
+
+      form {
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <form class="form-inline" role="form">
+        <input type="text" class="form-control" id="query" placeholder="Enter movie title">
+        <button type="submit" class="btn btn-primary">Fetch</button>
+      </form>
+      <div id="movie-details"></div>
+    </div>
+    <script id="movie-template" type="text/template">
+      <h1>Title: <%= Title %></h1>
+      <h1>Year: <%= Year %></h1>
+      <h1>Actors: <%= Actors %></h1>
+      <img src="<%= Poster %>">
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
+    <script>
+      // var apiBaseUrl = 'http://www.omdbapi.com/?t=';
+      // var template = _.template( $('#movie-template').html() );
+      // var $query = $('#query');
+
+      // $('form').submit(function(e) {
+      //   e.preventDefault();
+
+      //   $.getJSON(apiBaseUrl + $query.val()).done(function(response) {
+      //       $('#movie-details').html( template(response) );
+      //   })
+      // });
+      var MovieView = Backbone.View.extend({
+        el: '#movie-details',
+        template: _.template( $('#movie-template').html() ),
+
+        render: function(movieDetails) {
+          this.$el.html( this.template(movieDetails) );
+        }
+      });
+
+      var MainView = Backbone.View.extend({
+        el: 'body',
+        apiBaseUrl: 'http://www.omdbapi.com/?t=',
+        $query: this.$('#query'),
+        movieView: new MovieView(),
+
+        events: {
+          'submit': 'fetchMovieDetails'
+        },
+
+        fetchMovieDetails: function(e) {
+          e.preventDefault();
+
+          var _this = this;
+
+          $.getJSON( this.apiBaseUrl + this.$query.val() ).done(function(response) {
+            _this.movieView.render(response);
+          });
+        }
+      });
+
+      var mainView = new MainView();
+    </script>
+  </body>
+</html>
